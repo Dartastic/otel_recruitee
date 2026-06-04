@@ -2,7 +2,6 @@
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
 import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
-import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_recruitee_suppression.dart';
 
@@ -52,47 +51,64 @@ Future<T> tracedRecruitee<T>({
   final t = tracer ?? OTel.tracerProvider().getTracer('otel_recruitee');
   final span = t.startSpan('recruitee $operation', kind: SpanKind.client);
   try {
-    span.setStringAttribute('rpc.system', 'recruitee');
+    span.addAttributes(
+        OTel.attributes([OTel.attributeString('rpc.system', 'recruitee')]));
     final r = await invoke();
     final res = r.result;
     if (res != null) {
       if (res.companyId != null) {
-        span.setStringAttribute('recruitee.company.id', res.companyId!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('recruitee.company.id', res.companyId!)]));
       }
       if (res.offerId != null) {
-        span.setStringAttribute('recruitee.offer.id', res.offerId!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('recruitee.offer.id', res.offerId!)]));
       }
       if (res.offerTitle != null) {
-        span.setStringAttribute('recruitee.offer.title', res.offerTitle!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('recruitee.offer.title', res.offerTitle!)]));
       }
       if (res.offerStatus != null) {
-        span.setStringAttribute('recruitee.offer.status', res.offerStatus!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('recruitee.offer.status', res.offerStatus!)
+        ]));
       }
       if (res.candidateId != null) {
-        span.setStringAttribute('recruitee.candidate.id', res.candidateId!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('recruitee.candidate.id', res.candidateId!)
+        ]));
       }
       if (res.candidateStage != null) {
-        span.setStringAttribute(
-            'recruitee.candidate.stage', res.candidateStage!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('recruitee.candidate.stage', res.candidateStage!)
+        ]));
       }
       if (res.disqualifiedAt != null) {
-        span.setStringAttribute(
-            'recruitee.candidate.disqualified_at', res.disqualifiedAt!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+              'recruitee.candidate.disqualified_at', res.disqualifiedAt!)
+        ]));
       }
       if (res.placementId != null) {
-        span.setStringAttribute('recruitee.placement.id', res.placementId!);
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString('recruitee.placement.id', res.placementId!)
+        ]));
       }
       if (res.statusCode != null) {
-        span.setIntAttribute('http.response.status_code', res.statusCode!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeInt('http.response.status_code', res.statusCode!)]));
       }
       if (res.errorCode != null) {
-        span.setStringAttribute('recruitee.error.code', res.errorCode!);
+        span.addAttributes(OTel.attributes(
+            [OTel.attributeString('recruitee.error.code', res.errorCode!)]));
       }
       final fail = res.errorCode != null ||
           (res.statusCode != null && res.statusCode! >= 400);
       if (fail) {
-        span.setStringAttribute(
-            ErrorResource.errorType.key, res.errorCode ?? 'recruitee.error');
+        span.addAttributes(OTel.attributes([
+          OTel.attributeString(
+              ErrorResource.errorType.key, res.errorCode ?? 'recruitee.error')
+        ]));
         span.setStatus(SpanStatusCode.Error, res.errorMessage);
       }
     }
